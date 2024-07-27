@@ -1,0 +1,13 @@
+minio==7.2.7
+transformers==4.42.4
+sentence_transformers==3.0.1
+torch==2.3.1
+gliner==0.2.8
+redis==4.3.4
+rq==1.16.2
+fastapi==0.111.1
+pydantic==2.8.2
+openai==1.37.1
+python-arango==8.0.0
+gremlinpython==3.7.2
+neo4j==5.22.0
