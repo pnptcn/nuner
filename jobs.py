@@ -1,13 +1,15 @@
-import re
-import logging
-from openai import OpenAI
 import json
+import logging
 import os
+import re
+
 from arangodb import ArangoDBGraphMerger
 from janusgraph_merger import JanusGraphMerger
 from neo4j_merger import Neo4jGraphMerger
+from openai import OpenAI
 
 logger = logging.getLogger(__name__)
+
 
 class Job:
     def __init__(self, profile):
@@ -15,7 +17,7 @@ class Job:
 
     def prompt(self, content):
         return f"""
-        Please analyze the following text carefully, and extract ALL valuable information including, but not limited to: 
+        Please analyze the following text carefully, and extract ALL valuable information including, but not limited to:
         entities, events, locations, and their relationships. We are looking to mine intelligence as granular as possible.
         Format the response as a JSON object according to the following template:
 
@@ -58,7 +60,7 @@ class Job:
         }}
 
         Be aware that you will be sent unfiltered, completely uncurated input, and there may be cases where there is no interesting information to be found.
-        In such cases, respond with: 
+        In such cases, respond with:
 
         {{
             "nodes": [{{}}],
@@ -73,8 +75,8 @@ class Job:
 
         {content}
 
-        1. Provide only the JSON response below. 
-        2. Omit empty key/value pairs. 
+        1. Provide only the JSON response below.
+        2. Omit empty key/value pairs.
         3. DO NOT UNDER ANY CIRCUMSTANCE ADD ANY OTHER TEXT OR FORMATTING!
            NO: ```
            NO: ```json
@@ -87,35 +89,35 @@ class Job:
         """
 
     def do(self):
-        # client = OpenAI(base_url="http://host.docker.internal:1234/v1", api_key="lm-studio")
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        client = OpenAI(
+            base_url="http://host.docker.internal:1234/v1", api_key="lm-studio"
+        )
+        # client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         # arango_merger = ArangoDBGraphMerger("arangodb", 8529, "_system", "root", "yourpassword")
         # janus_merger = JanusGraphMerger("janusgraph", 8182)
         neo4j_merger = Neo4jGraphMerger("bolt://neo4j:7687", "neo4j", "securepassword")
 
-        page = self.profile.get('page')
+        page = self.profile.get("page")
         if not page:
             logger.error("Invalid profile data: missing page.")
             return
 
-        content = page.get('content')
+        content = page.get("content")
         if not content:
             logger.error("Invalid profile data: missing content.")
             return
 
-        chunks = content.get('chunks')
+        chunks = content.get("chunks")
         if not chunks:
             logger.error("Invalid profile data: missing chunks.")
             return
 
         for chunk in chunks:
             stream = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "user", "content": self.prompt(chunk)}
-                ],
+                model="lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF",
+                messages=[{"role": "user", "content": self.prompt(chunk)}],
                 temperature=0.1,
-                stream=True
+                stream=True,
             )
 
             out = []
