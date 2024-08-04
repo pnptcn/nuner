@@ -11,6 +11,7 @@ nltk.download('punkt', quiet=True)
 
 logger = logging.getLogger(__name__)
 
+
 class Job:
     def __init__(self, profile):
         self.profile = profile

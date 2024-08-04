@@ -1,16 +1,17 @@
-from fastapi import FastAPI, Request
-from rq import Queue
 import logging
-from worker import conn
-from jobs import Job
-import json
 from profile import Profile
+
+from extract_job import Job
+from fastapi import FastAPI
+from rq import Queue
+from worker import conn
 
 app = FastAPI()
 q = Queue("nuner", connection=conn)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @app.post("/ingress")
 async def ingress(profile: Profile):
