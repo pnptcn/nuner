@@ -11,3 +11,5 @@ openai==1.37.1
 python-arango==8.0.0
 gremlinpython==3.7.2
 neo4j==5.22.0
+nltk==3.8.1
+fuzzywuzzy==0.18.0
